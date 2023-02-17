@@ -2,10 +2,12 @@
 
 
 compile_and_run() {
-    filename=$1
-    (set -x && chpl ${filename}.chpl && ./$filename)
+    filename=$(basename $1)
+    dir=$(dirname $1)
+    execname=live.out
+    (cd $dir && set -x && chpl $filename -o $execname && ./$execname)
 }
 
 
 f=$1
-fswatch -o $f.chpl | (while read; do compile_and_run $f || true; done)
+fswatch -o $f | (while read; do compile_and_run $f || true; done)
