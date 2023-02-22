@@ -13,9 +13,11 @@ compile_and_run() {
     # no execfile or no stamp file or stampfile has older time than last edit time
     if [[ ! -f $execfile || ! -f $stampfile || $(< $stampfile) -lt $lastedittime ]]; then
         echo $lastedittime > $stampfile
-        (cd $dir && set -x && chpl $filename -o $execname)
+        (cd $dir && set -x && chpl $filename -o $execname || rm -f $execname)
     fi
-    (cd $dir && set -x && ./$execname $@)
+    if [[ -f $execfile ]]; then
+        (cd $dir && set -x && ./$execname $@)
+    fi
 }
 
 compile_and_run $@
