@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
 compile_and_run() {
-    filename=$(basename $1)
-    dir=$(dirname $1)
+    fullpath=$1
+    filename=$(basename $fullpath)
+    dir=$(dirname $fullpath)
     shift
-    execname=run.out
-    (cd $dir && echo "" && set -x && chpl $filename -o $execname && ./$execname $@)
+    execname=$(basename -s .chpl $filename).out
+    execfile=$dir/$execname
+
+    stampfile=$dir/.$execname.stamp
+    lastedittime=$(stat -f "%c" $fullpath)
+    # no execfile or no stamp file or stampfile has older time than last edit time
+    if [[ ! -f $execfile || ! -f $stampfile || $(< $stampfile) -lt $lastedittime ]]; then
+        echo $lastedittime > $stampfile
+        (cd $dir && set -x && chpl $filename -o $execname)
+    fi
+    (cd $dir && set -x && ./$execname $@)
 }
 
 compile_and_run $@
