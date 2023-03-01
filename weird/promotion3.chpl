@@ -13,5 +13,9 @@ proc assignCounter(ref x:int, counter=nextCounterValue()) {
 
 var A: [1..5] int;
 assignCounter(A);
+writeln(A);
 
+writeln();
+
+assignCounter(A, nextCounterValue());
 writeln(A);
